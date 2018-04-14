@@ -21,7 +21,7 @@
         function updateParticularFileData(fileName, fileData) {
             let fileDom = $('#content').find(`.${fileName.replace(/\./g, '-')}`);
             fileDom.empty();
-            fileDom.append(`<p><strong>File: ${fileName.replace(/\./g, '-')}</strong></p>`);
+            fileDom.append(`<p><strong>File: ${fileName}</strong></p>`);
             for (let index = 0; index < fileData.length; index++) {
                 fileDom.append(`<p>${fileData[index]}</p>`);
             }
