@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+
+        var socket = io('http://localhost:9000');
+        // let filesData;
+
+        socket.on('error-message', function (data) {
+            $('#content').empty();
+            $('#content').append(`<p><strong>Error: ${data.message}</strong></p>`);
+        });
+
+        socket.on('file-change', function (fileData) {
+            updateParticularFileData(fileData[0], fileData.slice(1));
+        });
+
+        function updateParticularFileData(fileName, fileData) {
+            let fileDom = $('#content').find(`.${fileName.replace(/\./g, '-')}`);
+            fileDom.empty();
+            fileDom.append(`<p><strong>File: ${fileName.replace(/\./g, '-')}</strong></p>`);
+            for (let index = 0; index < fileData.length; index++) {
+                fileDom.append(`<p>${fileData[index]}</p>`);
+            }
+        }
+
+        function addData(response) {
+            let keys = Object.keys(response);
+            for (let index = 0; index < keys.length; index++) {
+                let fileName = keys[index];
+                let fileData = response[fileName];
+                let fileContainerDiv = $(`<div class="${fileName.replace(/\./g, '-')}"></div>`);
+                $('#content').append(fileContainerDiv);
+                fileContainerDiv.append(`<p><strong>File: ${fileName}</strong></p>`);
+
+                for (let index = 0; index < fileData.length; index++) {
+                    fileContainerDiv.append(`<p>${fileData[index]}</p>`);
+                }
+            }
+        }
+
+        function getData() {
+            $.ajax({
+                url: '/file-data',
+                type: "GET",
+                success: function (response) {
+                    // filesData = response;
+                    addData(response);
+
+                    /* for (let i = 0; i < response.length; i++) {
+                        let fileData = response[i];
+                        for (let index = 0; index < fileData.length; index++) {
+                            if (index === 0) {
+                                $('#content').append(`<p><strong>${fileData[index]}</strong></p>`);
+                            }
+                            else {
+                                $('#content').append(`<p>${fileData[index]}</p>`);
+                            }
+                        }
+                    } */
+                    // $('#content').html(first);
+                },
+                error: function (params) {
+                    console.log(params);
+                },
+                async: false
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div id="content"></div>
+    <div>
+        <input id="content" type="button" name="button" value="Get File Data" onclick="getData()" />
+    </div>
+</body>
+
+</html>
